@@ -5,7 +5,7 @@ import User from './models/user.model.js'
 // Import Routes
 import characterRoutes from './routes/characters.route.js'
 import moviesRoutes from './routes/movies.route.js'
-import usersRoutes from './routes/users.route.js'
+import authRoutes from './routes/auth.route.js'
 
 const app = express();
 
@@ -14,7 +14,7 @@ app.use(morgan('dev'))
 
 // Routes
 app.use('/characters', characterRoutes)
-app.use('/movies.', moviesRoutes)
-app.use('/users', usersRoutes)
+app.use('/movies', moviesRoutes)
+app.use('/auth', authRoutes)
 
 export default app;
