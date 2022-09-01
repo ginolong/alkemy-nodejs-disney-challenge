@@ -9,9 +9,9 @@ import {
 
 const router = Router()
 
-router.get('/', getMovies)
+router.get('', getMovies)
 router.get('/:id', getMovie)
-router.post('/', createMovie)
+router.post('', createMovie)
 router.patch('/:id', updateMovie)
 router.delete('/:id', deleteMovie)
 

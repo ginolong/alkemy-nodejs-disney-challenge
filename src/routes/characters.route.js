@@ -9,9 +9,9 @@ import {
 
 const router = Router()
 
-router.get('/', getCharacters)
+router.get('', getCharacters)
 router.get('/:id', getCharacter)
-router.post('/', createCharacter)
+router.post('', createCharacter)
 router.patch('/:id', updateCharacter)
 router.delete('/:id', deleteCharacter)
 

@@ -2,10 +2,11 @@ import Character from '../models/character.model.js'
 
 export const getCharacters = async (req,res,next) => {
     try {
-        //throw new Error("test error")
-        const allCharacters = await Character.findAll()
-        if (!allCharacter)
-        throw new Error (`There are no characters created yet.`)
+        const allCharacters = await Character.findAll({
+            attributes: ['image', 'name']
+        })
+        if (!allCharacters)
+            throw new Error (`There are no characters created yet.`)
         res.send(allCharacters)   
     } catch (error) {
         next(error)
@@ -26,7 +27,6 @@ export const getCharacter = async (req,res,next) => {
 
 export const createCharacter = async (req,res,next) => {
     try {
-        //throw new Error("test error")
         const { image, name, age, weight, backstory } = req.body
         const newCharacter = await Character.create ({
             image, 
