@@ -5,13 +5,13 @@ import sequelize from '../database/database.js'
 // Include timestamp for 'Created at' field
 
 const Movie = sequelize.define('Movie', {
+    image: {
+        type: DataTypes.STRING,
+    },
     title: {
         type: DataTypes.STRING,
         allowNull: false,
         isUnique: true,
-    },
-    image: {
-        type: DataTypes.STRING,
     },
     rating: {
         type: DataTypes.INTEGER,
