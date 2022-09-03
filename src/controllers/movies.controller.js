@@ -16,10 +16,10 @@ export const getMovies = async (req,res,next) => {
 
 export const getMovie = async (req,res,next) => {
     try {
-        const id = req.params.id
-        const movie = await Movie.findByPk(id)
+        const movie = await Movie.findByPk(req.params.id)
+        //console.log((await mov.getGenre()).name)
         if (!movie)
-            throw new Error (`Movie with id: ${id}, doesn't exists.`)
+            throw new Error (`Movie with id: ${req.params.id}, doesn't exists.`)
         res.send(movie)
     } catch (error) {
         next(error)
@@ -27,16 +27,20 @@ export const getMovie = async (req,res,next) => {
 }
 
 export const createMovie = async (req,res,next) => {
-    try {
-/*         const { image, title, year, rating } = req.body
+    try {         
+        const { image, title, year, rating, genreId } = req.body
         const newMovie = await Movie.build ({
             image, 
             title,
             year,
             rating,
-        }) */
-        const newMovie = Movie.build (req.body)
-        // validate newMovie through service: validateMovie(newMovie)
+            genreId
+        })
+        /*
+        validate newMovie fields through service: validateMovie(newMovie, genre)
+        validate genre and check if it exists with findbypk(genre), if it does then: newMovie.setGenre(genre)
+        const genre = await Genre.findByPk(req.body.genreId)
+        */
         await newMovie.save()
         res.json(newMovie)
     } catch (error) {
@@ -46,13 +50,12 @@ export const createMovie = async (req,res,next) => {
 
 export const updateMovie = async (req,res,next) => {
     try {
-        const id = req.params.id
-        const movieToUpdate = await Movie.findByPk(id)
+        const movieToUpdate = await Movie.findByPk(req.params.id)
         // TO DO: Check if pk exists, characterToUpdate is not empty. Send to validation & error handling services
         const oldMovieTitle = movieToUpdate.title
         await movieToUpdate.update(req.body)
         res.send(
-            `Movie ${oldMovieTitle} (Id: ${id}) was successfully updated to: 
+            `Movie ${oldMovieTitle} (Id: ${req.params.id}) was successfully updated to: 
             <pre> ${JSON.stringify(movieToUpdate.dataValues, null, 4)} </pre>`
         )
     } catch (error) {
