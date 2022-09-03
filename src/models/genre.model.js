@@ -12,6 +12,7 @@ const Genre = sequelize.define('Genre', {
     },
 }, {
     // Other model options go here
+    timestamps: false
 })
 
 export default Genre

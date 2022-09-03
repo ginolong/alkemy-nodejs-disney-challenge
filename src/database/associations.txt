@@ -1,0 +1,45 @@
+DOCS
+
+https://sequelize.org/docs/v6/core-concepts/assocs/
+https://sequelize.org/docs/v6/advanced-association-concepts/advanced-many-to-many/
+
+Genre has many movies
+    ON DELETE RESTRICT? (can't delete a genre if it has movies) https://www.techtarget.com/searchoracle/answer/ON-DELETE-RESTRICT
+    Foo.hasOne(Bar, {
+        onDelete: 'RESTRICT',
+        onUpdate: 'RESTRICT'
+    });
+        Bar.belongsTo(Foo);
+    
+        
+Movie has many characters
+
+Character has many movies
+
+MOVIE GENRE, should genre be mandatory when creating a movie? if so, we can force the association like this:
+Movie.hasOne(Genre, {
+  foreignKey: {
+    allowNull: false
+  }
+});
+
+----------------------------------
+One to Many
+Genre draft:
+
+Genre.hasMany(Movie, {
+  foreignKey: {
+    //name: 'genreId',
+    allowNull: false,
+    onDelete: 'RESTRICT', // this shouldn't allow to delete a genre as long as there are movies in that genre. This maintains relational integrity, since searching/filter by genre is a technical requirement of the project.
+  }
+});
+Movie.belongsTo(Genre);
+
+
+Many to Many 
+Movies and Characters relations should look something like this:
+
+  Character.belongsToMany(Movie, { through: 'Character_Movies'})
+  Movie.belongsToMany(Character, { through: 'Character_Movies'})
+

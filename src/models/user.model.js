@@ -4,8 +4,6 @@
 *
 *   TO DO: 
 *
-*   Associations
-*
 *   Include a simple regex validation for length and special characters
 *   Validations: https://sequelize.org/docs/v6/core-concepts/validations-and-constraints/
 *   should id be uuid?

@@ -3,7 +3,7 @@ import Movie from '../models/movie.model.js'
 export const getMovies = async (req,res,next) => {
     try {
         const allMovies = await Movie.findAll({
-            attributes: ['id', 'image', 'title', 'createdAt']
+            attributes: ['id', 'image', 'title', 'year']
         })
         console.log(allMovies)
         if (!allMovies.length)
@@ -28,12 +28,16 @@ export const getMovie = async (req,res,next) => {
 
 export const createMovie = async (req,res,next) => {
     try {
-        const { image, title, rating } = req.body
-        const newMovie = await Movie.create ({
+/*         const { image, title, year, rating } = req.body
+        const newMovie = await Movie.build ({
             image, 
-            title, 
-            rating
-        })
+            title,
+            year,
+            rating,
+        }) */
+        const newMovie = Movie.build (req.body)
+        // validate newMovie through service: validateMovie(newMovie)
+        await newMovie.save()
         res.json(newMovie)
     } catch (error) {
         next(error)

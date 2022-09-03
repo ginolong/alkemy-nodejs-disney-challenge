@@ -1,8 +1,10 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../database/database.js' 
 
-// TO DO: Validate rating 1 to 5
-// Include timestamp for 'Created at' field
+/* TO DO: 
+        Should rating be FLOAT?
+        Validate year, only 4 integers (ex. 1994) min first disney movie 1937  - max current year
+*/
 
 const Movie = sequelize.define('Movie', {
     image: {
@@ -13,11 +15,16 @@ const Movie = sequelize.define('Movie', {
         allowNull: false,
         isUnique: true,
     },
+    year: {
+        type: DataTypes.INTEGER,
+    },
     rating: {
         type: DataTypes.INTEGER,
+        validate: { min: 1, max: 5 }
     },
 }, {
     // Other model options go here
+    timestamps: false
 })
 
 export default Movie

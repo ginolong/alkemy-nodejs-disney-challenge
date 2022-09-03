@@ -20,6 +20,7 @@ const Character = sequelize.define('Character', {
     }
 }, {
     // Other model options go here
+    timestamps: false
 })
 
 export default Character
