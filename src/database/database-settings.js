@@ -16,8 +16,12 @@ const databaseAssociations = async () => {
         // One to Many association
         Movie.belongsTo(Genre, { as: 'genre' }) // it's important to define associations before sequelize.sync
 
+        // Many to Many association
+        Movie.belongsToMany(Character, { through: 'Character_Movies'})
+        Character.belongsToMany(Movie, { through: 'Character_Movies'})
+
         await sequelize.sync()
-        await generateGenres() // Creates genres to work with movies, since users can't create them according to technical requirements
+        await generateGenres() // Creates mock genres to work with movies, since users can't create them according to technical requirements
 
     } catch (error) {
         console.log('Associations error', error)

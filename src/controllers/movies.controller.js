@@ -1,4 +1,5 @@
 import Movie from '../models/movie.model.js'
+import Character from '../models/character.model.js'
 
 export const getMovies = async (req,res,next) => {
     try {
@@ -16,7 +17,7 @@ export const getMovies = async (req,res,next) => {
 
 export const getMovie = async (req,res,next) => {
     try {
-        const movie = await Movie.findByPk(req.params.id)
+        const movie = await Movie.findByPk(req.params.id, {include: Character })
         //console.log((await mov.getGenre()).name)
         if (!movie)
             throw new Error (`Movie with id: ${req.params.id}, doesn't exists.`)
@@ -28,7 +29,7 @@ export const getMovie = async (req,res,next) => {
 
 export const createMovie = async (req,res,next) => {
     try {         
-        const { image, title, year, rating, genreId } = req.body
+        const { image, title, year, rating, genreId, charactersId } = req.body
         const newMovie = await Movie.build ({
             image, 
             title,
@@ -36,6 +37,7 @@ export const createMovie = async (req,res,next) => {
             rating,
             genreId
         })
+        newMovie.addCharacters(charactersId) // it's not asynchronous, because it's not in the database yet (build)
         /*
         validate newMovie fields through service: validateMovie(newMovie, genre)
         validate genre and check if it exists with findbypk(genre), if it does then: newMovie.setGenre(genre)
@@ -53,7 +55,9 @@ export const updateMovie = async (req,res,next) => {
         const movieToUpdate = await Movie.findByPk(req.params.id)
         // TO DO: Check if pk exists, characterToUpdate is not empty. Send to validation & error handling services
         const oldMovieTitle = movieToUpdate.title
-        await movieToUpdate.update(req.body)
+        await movieToUpdate.update(req.body) // validate fields
+        await movieToUpdate.setCharacters(req.body.charactersId) // TO DO validate charactersId existence
+
         res.send(
             `Movie ${oldMovieTitle} (Id: ${req.params.id}) was successfully updated to: 
             <pre> ${JSON.stringify(movieToUpdate.dataValues, null, 4)} </pre>`
