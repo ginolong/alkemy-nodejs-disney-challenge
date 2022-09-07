@@ -1,15 +1,83 @@
 import Movie from '../models/movie.model.js'
 import Character from '../models/character.model.js'
+import { Op } from 'sequelize'
+
+/* export const getMovies = async (req,res,next) => {
+    try {
+        console.log('QUERY', req.query)
+
+        let movies = ''
+        let { title, genre, order } = req.query
+
+        let orderedByTime = []
+        if (order === 'DESC')
+            orderedByTime = [['createdAt', order]] // order is ASC by default, this only checks DESC to prevent wrong query parameters
+
+        if (!req.query.title)
+            title = '' // this will match every title
+
+        if (!genre) {
+            movies = await Movie.findAll({
+                where: { 
+                    title: { 
+                        [Op.substring]: title // Op.substring works as 'contains' - DOC -> https://sequelize.org/docs/v6/core-concepts/model-querying-basics/
+                    }, 
+                },
+                order: orderedByTime,
+                attributes: ['id', 'image', 'title', 'createdAt']
+            })
+        } else {
+            movies = await Movie.findAll({
+                where: { 
+                    title: { 
+                        [Op.substring]: title 
+                    },
+                    genreId: genre // Can't find a way to make a field optional, perhaps a fn? Had to replicate the entire block to include genre in case it's in query
+                },
+                order: orderedByTime,
+                attributes: ['id', 'image', 'title', 'createdAt']
+            })
+        }
+        res.send(movies)
+    } catch (error) {
+        next(error)
+    }
+} */
 
 export const getMovies = async (req,res,next) => {
     try {
-        const allMovies = await Movie.findAll({
-            attributes: ['id', 'image', 'title', 'year']
+        console.log('QUERY', req.query)
+
+        let movies = ''
+        let { title, genre, order } = req.query
+
+        let orderedByTime = []
+        if (order === 'DESC') // order is ASC by default, this only checks DESC to prevent wrong query parameters
+            orderedByTime = [['createdAt', order]] 
+
+        if (!req.query.title)
+            title = '' // this will match every title
+
+        if (!genre)
+            genre = '' // this will match every genre
+
+        movies = await Movie.findAll({
+            where: { 
+                title: { 
+                    [Op.substring]: title // Op.substring works as 'contains' - DOC -> https://sequelize.org/docs/v6/core-concepts/model-querying-basics/
+                }, 
+                genreId: {
+                    [Op.substring]: genre
+                }
+            },
+            order: orderedByTime,
+            attributes: ['id', 'image', 'title', 'createdAt']
         })
-        console.log(allMovies)
-        if (!allMovies.length)
-            throw new Error (`There are no movies created yet.`)
-        res.send(allMovies)   
+
+        if (!movies.length)
+            throw new Error (`No movies were found.`) 
+            
+        res.send(movies)
     } catch (error) {
         next(error)
     }
@@ -37,7 +105,10 @@ export const createMovie = async (req,res,next) => {
             rating,
             genreId
         })
-        newMovie.addCharacters(charactersId) // it's not asynchronous, because it's not in the database yet (build)
+        if (charactersId.length) {
+            // FIX if you try to add a non-existent character it crashes, validate
+            newMovie.addCharacters(charactersId) // it's not asynchronous, because it's not in the database yet (build)
+        }
         /*
         validate newMovie fields through service: validateMovie(newMovie, genre)
         validate genre and check if it exists with findbypk(genre), if it does then: newMovie.setGenre(genre)

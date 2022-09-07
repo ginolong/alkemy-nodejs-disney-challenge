@@ -15,16 +15,14 @@ const Movie = sequelize.define('Movie', {
         allowNull: false,
         isUnique: true,
     },
-    year: {
-        type: DataTypes.INTEGER,
-    },
     rating: {
         type: DataTypes.INTEGER,
         validate: { min: 1, max: 5 }
     },
 }, {
     // Other model options go here
-    timestamps: false
+    timestamps: true,
+    updatedAt: false
 })
 
 export default Movie
