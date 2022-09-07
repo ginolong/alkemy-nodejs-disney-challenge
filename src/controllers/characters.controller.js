@@ -1,14 +1,45 @@
 import Character from '../models/character.model.js'
 import Movie from '../models/movie.model.js'
+import { Op } from 'sequelize'
 
 export const getCharacters = async (req,res,next) => {
     try {
-        const allCharacters = await Character.findAll({
-            attributes: ['id', 'image', 'name'] // 'id' attribute only for delete testing, remove before prod
-        })
-        if (!allCharacters.length)
-            throw new Error (`There are no characters created yet.`) // move to validation & error handling services
-        res.send(allCharacters)   
+        if (!Object.keys(req.query).length) { // if there is no query, find all with no parameters
+            let allCharacters = await Character.findAll()
+            if (!allCharacters.length)
+                allCharacters = 'There are no characters created yet.'
+            res.json(allCharacters)
+        } else {
+            let { name = '', age = '', weight = '', movies = '' } = req.query // default value '' matches any result, in case that parameter is not in the query TO DO validate query 
+
+            let characters = await Character.findAll({
+                where: {
+                    name: { 
+                        [Op.substring]: name // Op.substring works as 'contains', it isn't case sensitive - DOC -> https://sequelize.org/docs/v6/core-concepts/model-querying-basics/
+                    },
+                    age: {
+                        [Op.substring]: age
+                    },
+                    weight: {
+                        [Op.substring]: weight
+                    }
+                },
+                include: {  
+                    model: Movie,
+                    where: {    // filter at the associated model level - DOC https://sequelize.org/docs/v6/advanced-association-concepts/eager-loading/
+                        id: {
+                            [Op.substring]: movies  // works with arrays too: ?movies=1&movies=2&movies=3
+                        }
+                    },
+                    attributes: [] // No need to show any attributes, just confirm the association
+                },
+                attributes: ['id', 'image', 'name'] // 'id' attribute only for delete testing, remove before prod
+            })
+
+            if (!characters.length)
+                characters = 'No characters were found.' // move to validation & error handling services
+            res.json(characters)   
+        }
     } catch (error) {
         next(error)
     }
@@ -37,7 +68,7 @@ export const createCharacter = async (req,res,next) => {
             weight, 
             backstory
         })
-        newCharacter.addMovies(moviesId) // it's not asynchronous, because it's not in the database yet
+        newCharacter.addMovies(moviesId) // it's not asynchronous, because it's not in the database yet (build)
         
         await newCharacter.save()
         res.json(newCharacter)

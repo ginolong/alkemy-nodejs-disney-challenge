@@ -2,82 +2,37 @@ import Movie from '../models/movie.model.js'
 import Character from '../models/character.model.js'
 import { Op } from 'sequelize'
 
-/* export const getMovies = async (req,res,next) => {
+export const getMovies = async (req,res,next) => {
     try {
-        console.log('QUERY', req.query)
+        if (!Object.keys(req.query).length) { // if there is no query, find all with no parameters
+            let allMovies = await Movie.findAll()
+            if (!allMovies.length)
+                allMovies = 'There are no movies created yet.'
+            res.json(allMovies)
+        } else {
+            let { title = '', genre = '', order } = req.query // default value '' matches any result, in case that parameter is not in the query TO DO validate query 
+            let orderedByTime = []
 
-        let movies = ''
-        let { title, genre, order } = req.query
+            if (order === 'DESC') // order is ASC by default, this only checks DESC to prevent wrong query parameters
+                orderedByTime = [['createdAt', order]] 
 
-        let orderedByTime = []
-        if (order === 'DESC')
-            orderedByTime = [['createdAt', order]] // order is ASC by default, this only checks DESC to prevent wrong query parameters
-
-        if (!req.query.title)
-            title = '' // this will match every title
-
-        if (!genre) {
-            movies = await Movie.findAll({
+            let movies = await Movie.findAll({
                 where: { 
                     title: { 
                         [Op.substring]: title // Op.substring works as 'contains' - DOC -> https://sequelize.org/docs/v6/core-concepts/model-querying-basics/
                     }, 
+                    genreId: {
+                        [Op.substring]: genre
+                    }
                 },
                 order: orderedByTime,
                 attributes: ['id', 'image', 'title', 'createdAt']
             })
-        } else {
-            movies = await Movie.findAll({
-                where: { 
-                    title: { 
-                        [Op.substring]: title 
-                    },
-                    genreId: genre // Can't find a way to make a field optional, perhaps a fn? Had to replicate the entire block to include genre in case it's in query
-                },
-                order: orderedByTime,
-                attributes: ['id', 'image', 'title', 'createdAt']
-            })
+
+            if (!movies.length)
+                movies = 'No movies were found.'  // throw new Error (`No movies were found.`) 
+            res.json(movies)
         }
-        res.send(movies)
-    } catch (error) {
-        next(error)
-    }
-} */
-
-export const getMovies = async (req,res,next) => {
-    try {
-        console.log('QUERY', req.query)
-
-        let movies = ''
-        let { title, genre, order } = req.query
-
-        let orderedByTime = []
-        if (order === 'DESC') // order is ASC by default, this only checks DESC to prevent wrong query parameters
-            orderedByTime = [['createdAt', order]] 
-
-        if (!req.query.title)
-            title = '' // this will match every title
-
-        if (!genre)
-            genre = '' // this will match every genre
-
-        movies = await Movie.findAll({
-            where: { 
-                title: { 
-                    [Op.substring]: title // Op.substring works as 'contains' - DOC -> https://sequelize.org/docs/v6/core-concepts/model-querying-basics/
-                }, 
-                genreId: {
-                    [Op.substring]: genre
-                }
-            },
-            order: orderedByTime,
-            attributes: ['id', 'image', 'title', 'createdAt']
-        })
-
-        if (!movies.length)
-            throw new Error (`No movies were found.`) 
-            
-        res.send(movies)
     } catch (error) {
         next(error)
     }
