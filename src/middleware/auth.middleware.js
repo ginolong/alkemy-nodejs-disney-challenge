@@ -2,14 +2,15 @@ import passport from 'passport'
 import { Strategy as localStrategy } from 'passport-local'
 import { Strategy as JwtStrategy } from 'passport-jwt'
 import { ExtractJwt } from 'passport-jwt'
-import jwt from 'jsonwebtoken'
 import User from '../models/user.model.js'
+
+/*
+* T
+*/
 
 /* TODO Error handling, strategies don't reflect the exact errors */
 
 // Check JWT
-const passportAuthToken = passport.authenticate('jwt', { session: false })
-
 passport.use(
     new JwtStrategy(
         {
@@ -27,8 +28,6 @@ passport.use(
 )
 
 // Register
-const passportAuthRegister = passport.authenticate('register', { session: false })
-
 passport.use(
     'register',
     new localStrategy(
@@ -49,36 +48,6 @@ passport.use(
 
 
 // Login
-const passportAuthLogin = async (req, res, next) => {
-    passport.authenticate(
-        'login',
-        async (err, user) => {
-            try {
-                if (err || !user) {
-                    const error = new Error('An error occurred.')
-
-                    return next(error)
-                }
-
-                req.login(
-                    user,
-                    { session: false },
-                    async (error) => {
-                        if (error) return next(error)
-
-                        const body = { id: user.id, email: user.email }
-                        const token = jwt.sign({ user: body }, 'ALKEMY_CHALLENGE') // env var?
-
-                        return res.json({ token })
-                    }
-                )
-            } catch (error) {
-                return next(error)
-            }
-        }
-    )(req, res, next)
-}
-
 passport.use(
     'login',
     new localStrategy(
@@ -108,4 +77,4 @@ passport.use(
     )
 )
 
-export { passport, passportAuthToken, passportAuthRegister, passportAuthLogin }
+export { passport }

@@ -1,5 +1,4 @@
-import { passportAuthRegister, passportAuthLogin } from '../middleware/auth.middleware.js'
-
+import { passportAuthRegister, passportAuthLogin } from '../services/auth.service.js'
 export const authLogin = async (req, res, next) => {
     await passportAuthLogin(req, res, next)
 }

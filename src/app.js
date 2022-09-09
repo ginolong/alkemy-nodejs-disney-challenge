@@ -1,6 +1,6 @@
 import express from 'express'
 import morgan from 'morgan'
-import { passportAuthToken }  from './middleware/auth.middleware.js'
+import { passportAuthToken }  from './services/auth.service.js'
 import databaseSettings from './database/database-settings.js'
 
 // Import Routes
