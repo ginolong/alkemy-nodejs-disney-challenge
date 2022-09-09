@@ -1,7 +1,4 @@
 /*
-*   Sequelize handles automatically an id as pk in the query.
-*   To define a custom one use the constraint primaryKey: true
-*
 *   TO DO: 
 *
 *   Include a simple regex validation for length and special characters
@@ -10,17 +7,22 @@
 *
 *   Read more about SQL injection using Sequelize, try testing with Snyk
 *   https://docs.snyk.io/snyk-cli/cli-reference
+*
+*   Using bcrypt with sequelize:
+*   DOC https://sequelize.org/docs/v6/other-topics/hooks/ 
+*   https://stackoverflow.com/questions/34120548/using-bcrypt-with-sequelize-model
 */
 
 import { DataTypes } from 'sequelize'
 import sequelize from '../database/database.js' 
+import bcrypt from 'bcrypt'
 
 const User = sequelize.define('User', {
     email: {
         type: DataTypes.STRING,
         allowNull: false,
         isEmail: true,
-        isUnique: true,
+        unique: true,
     },
     password: {
         type: DataTypes.STRING,
@@ -30,6 +32,12 @@ const User = sequelize.define('User', {
     // Other model options go here
 })
 
-// console.log('User Model:', User === sequelize.models.User)
+User.beforeCreate(async (user) => {
+    user.password = await bcrypt.hash(user.password, 8)
+})
+
+User.prototype.isValidPassword = async function(password) { 
+    return await bcrypt.compare(password, this.password); // this references user
+}
 
 export default User

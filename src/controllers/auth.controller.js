@@ -1,9 +1,11 @@
-import User from '../models/user.model.js'
+import { passportAuthRegister, passportAuthLogin } from '../middleware/auth.middleware.js'
 
-export const authLogin = (req,res) => {
-    res.send('authLogin')
+export const authLogin = async (req, res, next) => {
+    await passportAuthLogin(req, res, next)
 }
 
-export const authRegister = (req,res) => {
-    res.send('authRegister')
+export const authRegister = async (req, res, next) => {
+    await passportAuthRegister(req, res, next)
+    // TODO send welcome email
 }
+
