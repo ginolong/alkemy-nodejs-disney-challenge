@@ -2,3 +2,4 @@ node_modules/
 src/database/database.sqlite
 src/database/sqlite3.exe
 notes.txt
+.env

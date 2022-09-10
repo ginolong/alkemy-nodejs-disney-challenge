@@ -3,10 +3,7 @@ import { Strategy as localStrategy } from 'passport-local'
 import { Strategy as JwtStrategy } from 'passport-jwt'
 import { ExtractJwt } from 'passport-jwt'
 import User from '../models/user.model.js'
-
-/*
-* T
-*/
+import { sendWelcomeMail } from '../services/email.service.js'
 
 /* TODO Error handling, strategies don't reflect the exact errors */
 
@@ -14,8 +11,8 @@ import User from '../models/user.model.js'
 passport.use(
     new JwtStrategy(
         {
-            secretOrKey: 'ALKEMY_CHALLENGE', // use env var?
-            jwtFromRequest: ExtractJwt.fromUrlQueryParameter('user_token')
+            secretOrKey: process.env.SECRET_TOKEN || 'ALKEMY_CHALLENGE',
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
         },
         async (token, done) => {
             try {
@@ -38,6 +35,7 @@ passport.use(
         async (email, password, done) => {
             try {
                 const user = await User.create({ email, password })
+                sendWelcomeMail(email) // calls email service if registration was successful
                 return done(null, user)
             } catch (error) {
                 done(error)

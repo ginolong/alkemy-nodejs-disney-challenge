@@ -8,7 +8,6 @@ import characterRoutes from './routes/characters.route.js'
 import moviesRoutes from './routes/movies.route.js'
 import authRoutes from './routes/auth.route.js'
 
-
 const app = express()
 databaseSettings() // database associations and connection
 
