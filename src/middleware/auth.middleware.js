@@ -11,7 +11,7 @@ import { sendWelcomeMail } from '../services/email.service.js'
 passport.use(
     new JwtStrategy(
         {
-            secretOrKey: process.env.SECRET_TOKEN || 'ALKEMY_CHALLENGE',
+            secretOrKey: process.env.TOKEN_SECRET || 'ALKEMY_CHALLENGE', // alternative secret for testing, in case .env is not set
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
         },
         async (token, done) => {

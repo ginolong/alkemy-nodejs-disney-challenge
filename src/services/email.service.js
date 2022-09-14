@@ -7,6 +7,11 @@
 
 import sgMail from '@sendgrid/mail'
 
+if (process.env.SENDGRID_API_KEY) 
+    console.log ('API KEY for Sendgrid SMTP service set.')
+else
+    console.log ('API KEY for Sendgrid not found, SMTP service is offline.')
+
 export const sendWelcomeMail = (email) => {
     if (process.env.SENDGRID_API_KEY) { 
         if (process.env.SENDGRID_TEMPLATE_ID) {     
@@ -28,7 +33,7 @@ export const sendWelcomeMail = (email) => {
             noTemplateMail(email)
         }
     } else {
-        console.error('SENDGRID_API_KEY not found, email delivery service is not working.')
+        console.error('SENDGRID_API_KEY not found, SMTP service is not working.')
     }
 }
 

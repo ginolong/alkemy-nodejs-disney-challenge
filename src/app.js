@@ -9,7 +9,7 @@ import moviesRoutes from './routes/movies.route.js'
 import authRoutes from './routes/auth.route.js'
 
 const app = express()
-databaseSettings() // database associations and connection
+databaseSettings() // database associations and genre creation
 
 // Middleware
 app.use(morgan('dev'))

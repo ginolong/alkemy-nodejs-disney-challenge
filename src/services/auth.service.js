@@ -22,8 +22,8 @@ const passportAuthLogin = async (req, res, next) => {
                     async (error) => {
                         if (error) return next(error)
 
-                        const body = { id: user.id, email: user.email }
-                        const token = jwt.sign({ user: body }, 'ALKEMY_CHALLENGE') // env var?
+                        const body = { id: user.id, email: user.email } // no user sensitive information like passwords should be stored in the token
+                        const token = jwt.sign({ user: body }, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_EXPIRATION  || '8h'  })
 
                         return res.json({ token })
                     }
