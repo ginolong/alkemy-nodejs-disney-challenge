@@ -9,7 +9,7 @@ import { sendWelcomeMail } from '../services/email.service.js'
 passport.use(
     new JwtStrategy(
         {
-            secretOrKey: process.env.TOKEN_SECRET || 'ALKEMY_CHALLENGE', // alternative secret for testing, in case .env is not set
+            secretOrKey: process.env.TOKEN_SECRET,
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
         },
         async (token, done) => {
@@ -33,7 +33,6 @@ passport.use(
         async (email, password, done) => {
             try {
                 const user = await User.create({ email, password })
-                sendWelcomeMail(email) // calls email service if registration was successful
                 return done(null, user)
             } catch (error) {
                 done(error)

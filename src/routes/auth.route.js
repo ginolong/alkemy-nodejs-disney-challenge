@@ -5,6 +5,6 @@ const router = Router()
 
 router.post('/login', authLogin)
 
-router.post('/register', authRegister, authLogin)
+router.post('/register', authRegister)
 
 export default router

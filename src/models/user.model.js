@@ -21,12 +21,21 @@ const User = sequelize.define('User', {
     email: {
         type: DataTypes.STRING,
         allowNull: false,
-        isEmail: true,
         unique: true,
+        validate: {
+            isEmail: {
+                msg: 'The username must be a valid email'
+            }
+        }
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false
+        validate: {
+            is: {
+                args: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+                msg: 'Password must be between 8 and 16 characters long, containing at least one uppercase, one lowercase and a number.'
+            }
+        }
     },
 }, {
     // Other model options go here
