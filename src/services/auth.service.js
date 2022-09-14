@@ -10,11 +10,10 @@ const passportAuthLogin = async (req, res, next) => {
         'login',
         async (err, user) => {
             try {
-                if (err || !user) {
-                    const error = new Error('An error occurred.')
+                if (err) return next(err)
 
-                    return next(error)
-                }
+                // double check for user
+                if (!user) return next(new Error('An error ocurred.'))
 
                 req.login(
                     user,
@@ -25,7 +24,7 @@ const passportAuthLogin = async (req, res, next) => {
                         const body = { id: user.id, email: user.email } // no user sensitive information like passwords should be stored in the token
                         const token = jwt.sign({ user: body }, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_EXPIRATION  || '8h'  })
 
-                        return res.json({ token })
+                        return res.status(200).json({ message: 'Logged in successfully', token })
                     }
                 )
             } catch (error) {

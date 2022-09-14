@@ -20,10 +20,10 @@ app.use('/characters', passportAuthToken, characterRoutes)
 app.use('/movies', passportAuthToken, moviesRoutes)
 app.use('/auth', authRoutes)
 
-// Provisional error handler
+// Error handler
 app.use(function(err, req, res, next) {
     res.status(err.status || 500)
-    res.json({ error: err })
+    res.json({ error: err.message })
 })
 
 export default app

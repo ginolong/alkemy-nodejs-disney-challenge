@@ -5,8 +5,6 @@ import { ExtractJwt } from 'passport-jwt'
 import User from '../models/user.model.js'
 import { sendWelcomeMail } from '../services/email.service.js'
 
-/* TODO Error handling, strategies don't reflect the exact errors */
-
 // Check JWT
 passport.use(
     new JwtStrategy(
@@ -58,16 +56,19 @@ passport.use(
                 const user = await User.findOne({ where: { email: email } })
                 
                 if (!user) {
-                    return done(null, false, { message: 'User not found' })
+                    const error = new Error('User not found')
+                    error.status = 404
+                    throw error
                 }
 
                 const validate = await user.isValidPassword(password)
-
                 if (!validate) {
-                    return done(null, false, { message: 'Wrong Password' })
+                    const error = new Error('Wrong password')
+                    error.status = 401
+                    throw error
                 }
 
-                return done(null, user, { message: 'Logged in Successfully' })
+                return done(null, user)
             } catch (error) {
                 return done(error)
             }
