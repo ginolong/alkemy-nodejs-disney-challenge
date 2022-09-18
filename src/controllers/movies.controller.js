@@ -111,13 +111,10 @@ export const createMovie = async (req, res, next) => {
         await newMovie.save()
 
         // Return created movie, including character associations
-        const createdMovie = await Movie.findOne({
-            where: {
-                title: title,
-                year: year
-            }, 
-            include: Character 
-        })
+        const createdMovie = await Movie.findByPk(
+            newMovie.id, 
+            { include: Character }
+        )
         return res.status(201).json(createdMovie)
     } catch (error) {
         next(error)

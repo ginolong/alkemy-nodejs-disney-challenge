@@ -81,7 +81,6 @@ export const getCharacter = async (req,res,next) => {
 export const createCharacter = async (req,res,next) => {
     try {
         const { image, name, age, weight, backstory, moviesId } = req.body
-        console.log(moviesId)
         const newCharacter = Character.build ({ // it's not asynchronous, because it's not in the database yet (build)
             image, 
             name, 
@@ -105,7 +104,14 @@ export const createCharacter = async (req,res,next) => {
 
         newCharacter.addMovies(moviesId)
         await newCharacter.save()
-        return res.status(201).json(newCharacter)
+
+        // Return created character, including movie associations
+        const createdCharacter = await Character.findByPk(
+            newCharacter.id, 
+            { include: Movie }
+        )
+        return res.status(201).json(createdCharacter)
+        //return res.status(201).json(newCharacter)
     } catch (error) {
         next(error)
     }
