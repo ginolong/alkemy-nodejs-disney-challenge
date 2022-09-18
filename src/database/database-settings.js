@@ -2,55 +2,27 @@ import sequelize from './database.js'
 import Character from '../models/character.model.js'
 import Movie from '../models/movie.model.js'
 import Genre from '../models/genre.model.js'
+import Character_Movies from '../models/character_movies.model.js'
 
 /*
-*
 *   Related doc to associations:
 *   https://sequelize.org/docs/v6/core-concepts/assocs/
 *   https://sequelize.org/docs/v6/advanced-association-concepts/advanced-many-to-many/
-*
+*   https://stackoverflow.com/questions/55322411/work-around-sequelize-s-unique-constraints-in-belongstomany-associations
 */
 
 const databaseAssociations = async () => {
     try {
         // One to Many association
-        Movie.belongsTo(Genre, { as: 'genre' }) // it's important to define associations before sequelize.sync
-
+        Movie.belongsTo(Genre, { as: 'genre' }) 
+        
         // Many to Many association
-        Movie.belongsToMany(Character, { through: 'Character_Movies'})
-        Character.belongsToMany(Movie, { through: 'Character_Movies'})
+        Movie.belongsToMany(Character, { through: { model: Character_Movies, unique: false } })
+        Character.belongsToMany(Movie, { through: { model: Character_Movies, unique: false } })
 
-        await sequelize.sync()
-        await generateGenres() // Creates mock genres to work with movies, since users can't create them according to technical requirements
-
+        await sequelize.sync() // it's important to define associations before sequelize.sync
     } catch (error) {
         console.log('Associations error', error)
-    }
-}
-
-const generateGenres = async () => {
-    try {
-        /* 3D · Action · Adventure · Animated · Christmas · Comedy · Disney Channel · Documentary · Dog · Drama · Fantasy · History · Musical · Mystery · NEW · Princess · Romantic · Science Fiction · Spooky/Halloween · Sports · War · Western */
-        await Genre.findOrCreate({
-            where: {
-                name: 'Live-action'
-            },
-            defaults: {
-                name: 'Live-action',
-                image: 'images/genres/live-action.jpg'
-            }
-        })
-        await Genre.findOrCreate({
-            where: {
-                name: 'Animated'
-            },
-            defaults: {
-                name: 'Animated',
-                image: 'images/genres/animated.jpg'
-            }
-        })
-    } catch (error) {
-        console.log("Couldn't generate genres ", error)
     }
 }
 
