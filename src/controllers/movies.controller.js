@@ -1,7 +1,7 @@
 import Movie from '../models/movie.model.js'
 import Character from '../models/character.model.js'
 import Genre from '../models/genre.model.js'
-import { Op } from 'sequelize'
+import { Op, where } from 'sequelize'
 
 /******************************************************************************************
 
@@ -109,7 +109,16 @@ export const createMovie = async (req, res, next) => {
 
         newMovie.addCharacters(charactersId)
         await newMovie.save()
-        return res.status(201).json(newMovie)
+
+        // Return created movie, including character associations
+        const createdMovie = await Movie.findOne({
+            where: {
+                title: title,
+                year: year
+            }, 
+            include: Character 
+        })
+        return res.status(201).json(createdMovie)
     } catch (error) {
         next(error)
     }

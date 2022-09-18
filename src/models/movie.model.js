@@ -13,7 +13,11 @@ const Movie = sequelize.define('Movie', {
     title: {
         type: DataTypes.STRING,
         allowNull: false,
-        isUnique: true,
+    },
+    year: {
+        type: DataTypes.INTEGER,
+        validate: { min: 1937, max: new Date().getFullYear() },
+        allowNull: false,
     },
     rating: {
         type: DataTypes.INTEGER,
