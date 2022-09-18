@@ -10,6 +10,7 @@ TO DO list:
     - Validate requests fields.
     - Update character association upon deletion.
     - Clear controller, move existing validation and error handling to dedicated services.
+    - Use in updateMovie the same genre and character association validations as in createMovie (as a service)
 
 *******************************************************************************************/
 
@@ -95,15 +96,18 @@ export const createMovie = async (req, res, next) => {
 
         // Characters existence validation
         if (charactersId) {
-            const characterExists = await Character.findAll({ where: { id: charactersId } })
-            if (!characterExists) {
-                const error = new Error(`Can't associate with non-existent resource. Character with Id ${charactersId} not found.`)
-                error.status = 400
-                throw error
+            let characterExists = ''
+            for (const id of charactersId) {
+                characterExists = await Character.findByPk(id)
+                if (!characterExists) {
+                    const error = new Error(`Can't associate with non-existent resource. Character with Id ${id} not found.`)
+                    error.status = 400
+                    throw error
+                }
             }
-            newMovie.addCharacters(charactersId)
         }
 
+        newMovie.addCharacters(charactersId)
         await newMovie.save()
         return res.status(201).json(newMovie)
     } catch (error) {
@@ -121,6 +125,8 @@ export const updateMovie = async (req, res, next) => {
             error.status = 400
             throw error
         }
+
+        // TO DO: validate characters to associate (exactly as createMovie, make it a service that can be used both for movies and characters ), and movie genre.
 
         await movieToUpdate.update(req.body)
         await movieToUpdate.setCharacters(req.body.charactersId)
