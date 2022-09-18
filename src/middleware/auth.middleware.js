@@ -4,6 +4,13 @@ import { Strategy as JwtStrategy } from 'passport-jwt'
 import { ExtractJwt } from 'passport-jwt'
 import User from '../models/user.model.js'
 
+/************************************************************************
+*  Passport Authentication Middleware -> https://www.passportjs.org/    *
+*       - Makes use of local and JwT strategies                         *
+*       - Needs a TOKEN_SECRET                                          *
+*                                                                       *
+************************************************************************/
+
 // Check JWT
 passport.use(
     new JwtStrategy(

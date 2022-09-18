@@ -2,6 +2,14 @@ import { passport } from '../middleware/auth.middleware.js'
 import jwt from 'jsonwebtoken'
 import { sendWelcomeMail } from '../services/email.service.js'
 
+/************************************************************
+*  Authentication using JsonWebToken -> https://jwt.io/     *
+*       - Based on Passport middleware                      *
+*       - Needs a TOKEN_SECRET                              *
+*       - Optional TOKEN_EXPIRATION                         *
+*                                                           *
+*************************************************************/
+
 const passportAuthToken = passport.authenticate('jwt', { session: false })
 
 const passportAuthRegister = async (req, res, next) => {

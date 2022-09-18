@@ -1,11 +1,11 @@
+import sgMail from '@sendgrid/mail'
+
 /************************************************************
 *   Sendgrid email delivery API - https://sendgrid.com/     *
 *       - Needs a private API KEY and a verified sender     *
 *       - Optional email template ID                        *
 *                                                           *
 *************************************************************/
-
-import sgMail from '@sendgrid/mail'
 
 if (process.env.SENDGRID_API_KEY) 
     console.log ('API KEY for Sendgrid SMTP service set.')
