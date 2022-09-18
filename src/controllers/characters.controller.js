@@ -127,8 +127,8 @@ export const updateCharacter = async (req,res,next) => {
 
         // TO DO: validate movies to associate (exactly as createCharacter, make it a service that can be used both for movies and characters )
         await characterToUpdate.setMovies(req.body.moviesId)
-
-        return res.status(200).json(characterToUpdate)
+        const characterUpdated = await Character.findByPk(id, {include: Movie })
+        return res.status(200).json(characterUpdated)
     } catch (error) {
         next(error)
     }

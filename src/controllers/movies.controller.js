@@ -130,7 +130,8 @@ export const updateMovie = async (req, res, next) => {
 
         await movieToUpdate.update(req.body)
         await movieToUpdate.setCharacters(req.body.charactersId)
-        return res.status(200).json(movieToUpdate)
+        const movieUpdated = await Movie.findByPk(req.params.id, { include: Character })
+        return res.status(200).json(movieUpdated)
     } catch (error) {
         next(error)
     }
