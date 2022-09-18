@@ -61,14 +61,14 @@ export const createCharacter = async (req,res,next) => {
     try {
         const { image, name, age, weight, backstory, moviesId } = req.body // TO DO send to validation & error handling services
         console.log(moviesId)
-        const newCharacter = await Character.build ({
+        const newCharacter = Character.build ({ // it's not asynchronous, because it's not in the database yet (build)
             image, 
             name, 
             age, 
             weight, 
             backstory
         })
-        newCharacter.addMovies(moviesId) // it's not asynchronous, because it's not in the database yet (build)
+        newCharacter.addMovies(moviesId) 
         
         await newCharacter.save()
         res.json(newCharacter)

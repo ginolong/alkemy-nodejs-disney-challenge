@@ -3,7 +3,6 @@ import { Strategy as localStrategy } from 'passport-local'
 import { Strategy as JwtStrategy } from 'passport-jwt'
 import { ExtractJwt } from 'passport-jwt'
 import User from '../models/user.model.js'
-import { sendWelcomeMail } from '../services/email.service.js'
 
 // Check JWT
 passport.use(
