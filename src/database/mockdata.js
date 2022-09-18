@@ -71,28 +71,28 @@ const movies = [
 
 const characters = [
     {   
-        image: "images/characters/mickey.jpg",
+        image: "images/characters/woody.jpg",
         name: "Woody",
         age: 28,
         weight: 80,
         backstory: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     },
     {   
-        image: "images/characters/mickey.jpg",
+        image: "images/characters/alice.jpg",
         name: "Alice",
         age:  7,
         weight: 55,
         backstory: "Purus sit amet volutpat consequat. In metus vulputate eu scelerisque felis imperdiet proin fermentum.",
     },
     {   
-        image: "images/characters/mickey.jpg",
+        image: "images/characters/buzz.jpg",
         name: "Buzz",
         age: 32,
         weight: 120,
         backstory: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
     },
     {   
-        image: "images/characters/mickey.jpg",
+        image: "images/characters/howard_langston.jpg",
         name: "Howard Langston",
         age: 41,
         weight: 180,
