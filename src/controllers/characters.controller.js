@@ -2,15 +2,31 @@ import Character from '../models/character.model.js'
 import Movie from '../models/movie.model.js'
 import { Op } from 'sequelize'
 
+/******************************************************************************************
+
+TO DO list:
+
+    - Validate requests fields.
+    - Update movie association upon deletion.
+    - Clear controller, move existing validation and error handling to dedicated services.
+    - Use in updateCharacter the same movies association validations as in createCharacter (as a service)
+
+*******************************************************************************************/
+
 export const getCharacters = async (req,res,next) => {
     try {
-        if (!Object.keys(req.query).length) { // if there is no query, find all with no parameters
-            let allCharacters = await Character.findAll()
-            if (!allCharacters.length)
-                allCharacters = 'There are no characters created yet.'
-            res.json(allCharacters)
+        // if there isn't a query, then findAll
+        if (!Object.keys(req.query).length) {
+            let allCharacters = await Character.findAll({ attributes: ['image', 'name'] })
+            if (!allCharacters.length) {
+                return res.status(200).json({ message: 'There are no characters created yet.' })
+            }
+            return res.status(200).json(allCharacters)
+
+        // if there is a query, then search and filter
         } else {
-            let { name = '', age = '', weight = '', movies = '' } = req.query // default value '' matches any result, in case that parameter is not in the query TO DO validate query 
+            // default value '' matches any result, in case that query is not present
+            let { name = '', age = '', weight = '', movies = '' } = req.query
 
             let characters = await Character.findAll({
                 where: {
@@ -31,14 +47,13 @@ export const getCharacters = async (req,res,next) => {
                             [Op.substring]: movies  // works with arrays too: ?movies=1&movies=2&movies=3
                         }
                     },
-                    attributes: [] // No need to show any attributes, just confirm the association
+                    attributes: [] // No need to show any attributes, used just to confirm the association
                 },
-                attributes: ['id', 'image', 'name'] // 'id' attribute only for delete testing, remove before prod
+                attributes: ['image', 'name']
             })
 
-            if (!characters.length)
-                characters = 'No characters were found.' // move to validation & error handling services
-            res.json(characters)   
+            // If no characters were found, return empty json 
+            return res.status(200).json(characters)   
         }
     } catch (error) {
         next(error)
@@ -49,9 +64,15 @@ export const getCharacter = async (req,res,next) => {
     try {
         const id = req.params.id
         const character = await Character.findByPk(id, {include: Movie })
-        if (!character)
-            throw new Error (`Character with id: ${id}, doesn't exists.`) // move to validation & error handling services
-        res.send(character)
+
+        // Character existence validation
+        if (!character) {
+            const error = new Error(`Character with Id ${id} not found.`)
+            error.status = 404
+            throw error
+        }
+
+        return res.status(200).json(character)
     } catch (error) {
         next(error)
     }
@@ -59,7 +80,7 @@ export const getCharacter = async (req,res,next) => {
 
 export const createCharacter = async (req,res,next) => {
     try {
-        const { image, name, age, weight, backstory, moviesId } = req.body // TO DO send to validation & error handling services
+        const { image, name, age, weight, backstory, moviesId } = req.body
         console.log(moviesId)
         const newCharacter = Character.build ({ // it's not asynchronous, because it's not in the database yet (build)
             image, 
@@ -68,10 +89,23 @@ export const createCharacter = async (req,res,next) => {
             weight, 
             backstory
         })
-        newCharacter.addMovies(moviesId) 
-        
+
+        // Movies existence validation
+        if (moviesId) {
+            let movieExists = ''
+            for (const id of moviesId) {
+                movieExists = await Movie.findByPk(id)
+                if (!movieExists) {
+                    const error = new Error(`Can't associate with non-existent resource. Movie with Id ${id} not found.`)
+                    error.status = 400
+                    throw error
+                }
+            }
+        }
+
+        newCharacter.addMovies(moviesId)
         await newCharacter.save()
-        res.json(newCharacter)
+        return res.status(201).json(newCharacter)
     } catch (error) {
         next(error)
     }
@@ -81,15 +115,20 @@ export const updateCharacter = async (req,res,next) => {
     try {
         const id = req.params.id
         const characterToUpdate = await Character.findByPk(id)
-        // TO DO: Check if pk exists, characterToUpdate is not empty. Send to validation & error handling services
-        const oldCharacterName = characterToUpdate.name
-        await characterToUpdate.update(req.body) // send to validation & error handling services
-        await characterToUpdate.setMovies(req.body.moviesId) // TO DO validate moviesId existence
 
-        res.send(
-            `Character ${oldCharacterName} (Id: ${id}) was successfully updated to: 
-            <pre> ${JSON.stringify(characterToUpdate.dataValues, null, 4)} </pre>`
-        )
+        // Validate character existence
+        if (!characterToUpdate) {
+            const error = new Error(`Can't update non-existent resource. Character with Id ${id} not found.`)
+            error.status = 400
+            throw error
+        }
+
+        await characterToUpdate.update(req.body)
+
+        // TO DO: validate movies to associate (exactly as createCharacter, make it a service that can be used both for movies and characters )
+        await characterToUpdate.setMovies(req.body.moviesId)
+
+        return res.status(200).json(characterToUpdate)
     } catch (error) {
         next(error)
     }
@@ -99,10 +138,16 @@ export const deleteCharacter = async (req,res,next) => {
     try {
         const id = req.params.id
         const characterToDelete = await Character.findByPk(id)
-        if (!characterToDelete)
-            throw new Error (`Can't delete a Character with a non-existent Id: ${id}`) // move to validation & error handling services
+
+        // Validate character existence
+        if (!characterToDelete) {
+            const error = new Error(`Can't delete non-existent resource. Character with Id ${id} not found.`)
+            error.status = 400
+            throw error
+        }
+
         await characterToDelete.destroy()
-        res.send(`Character ${characterToDelete.name} (Id: ${id}) was successfully deleted.`)
+        return res.status(200).json({ message: `Character ${characterToDelete.name} (Id: ${id}) was successfully deleted.` })
     } catch (error) {
         next(error)
     }
