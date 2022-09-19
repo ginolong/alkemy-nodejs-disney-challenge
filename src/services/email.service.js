@@ -31,7 +31,7 @@ export const sendWelcomeMail = (email) => {
                 })
             return ' Welcome email sent.'
         } else {
-            noTemplateMail(email)
+            return noTemplateMail(email)
         }
     } else {
         console.error('SENDGRID_API_KEY not found, SMTP service is not working.')
