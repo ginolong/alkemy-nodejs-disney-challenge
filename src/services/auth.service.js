@@ -42,10 +42,10 @@ const passportAuthRegister = async (req, res, next) => {
                     if (!user) return next(new Error('Something wen\'t wrong with the registration process.'))
 
                     // send welcome email if registration was successful
-                    sendWelcomeMail(user.email) 
-
+                    const welcomeMessage = sendWelcomeMail(user.email) 
+                    console.log(welcomeMessage)
                     // login after successful register
-                    passportAuthLogin(req, res, next)
+                    passportAuthLogin(req, res, next, welcomeMessage)
                 } catch (error) {
                     return next(error)
                 }
@@ -56,7 +56,7 @@ const passportAuthRegister = async (req, res, next) => {
     }
 }
 
-const passportAuthLogin = async (req, res, next) => {
+const passportAuthLogin = async (req, res, next, welcome) => {
     try {
         if (!req.body.email || !req.body.password) {
             const error = new Error('Both email and password are necessary to login')
@@ -82,8 +82,9 @@ const passportAuthLogin = async (req, res, next) => {
                             // no user sensitive information like passwords should be stored in the token
                             const body = { id: user.id, email: user.email } 
                             const token = jwt.sign({ user: body }, process.env.TOKEN_SECRET, { expiresIn: process.env.TOKEN_EXPIRATION || '8h' })
-
-                            return res.status(200).json({ user: user.email, message: 'Logged in successfully', token })
+                            let message = 'Logged in successfully.' 
+                            if(welcome) message += welcome
+                            return res.status(200).json({ user: user.email, message, token })
                         }
                     )
                 } catch (error) {

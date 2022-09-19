@@ -29,11 +29,13 @@ export const sendWelcomeMail = (email) => {
                 .catch((error) => {
                     console.error(error)
                 })
+            return ' Welcome email sent.'
         } else {
             noTemplateMail(email)
         }
     } else {
         console.error('SENDGRID_API_KEY not found, SMTP service is not working.')
+        return ' Welcome email not sent: SENDGRID_API_KEY not found, SMTP service is not working.'
     }
 }
 
@@ -89,4 +91,5 @@ const noTemplateMail = (email) => {
         .catch((error) => {
             console.error(error)
         })
+    return ' Welcome email sent, no template found.'
 }
